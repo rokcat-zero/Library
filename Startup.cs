@@ -1,6 +1,8 @@
+using Library.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,9 +28,23 @@ namespace Library
         public IConfiguration Configuration { get; }
         public static IConfiguration StatConfig { get; private set; }
 
+        public void ConfigureServer(IServiceCollection services)
+        {
+            services.AddDbContext<SiteContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SiteConnectionString")));
+        }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+                app.UseHsts();
+            }
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
